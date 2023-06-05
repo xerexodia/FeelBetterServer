@@ -23,6 +23,7 @@ const { $where } = require("./models/UserPro");
 const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const reaction = require("./routes/reaction");
+const note = require("./routes/note");
 require("./models/challange");
 const challenge = require("./models/challange");
 //
@@ -31,6 +32,7 @@ app.use(authRouters);
 app.use(postRoutes);
 app.use(commentRoutes);
 app.use(reaction);
+app.use(note);
 //
 
 app.get("/", requireToken, (req, res) => {

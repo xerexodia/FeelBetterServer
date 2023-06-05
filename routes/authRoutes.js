@@ -45,7 +45,12 @@ router.post("/Signup", async (req, res) => {
   try {
     await user.save();
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-    res.send({ status: "success", msg: "user Registerd Successfully ", token });
+    res.send({
+      status: "success",
+      msg: "user Registerd Successfully ",
+      token,
+      data: user,
+    });
   } catch (err) {
     console.log(err);
   }
@@ -93,7 +98,7 @@ router.post("/Login", async (req, res) => {
       if (result) {
         console.log("pasword match");
         const token = jwt.sign({ _id: savedUser._id }, process.env.JWT_SECRET);
-        res.send({ token });
+        res.send({ token, data: savedUser });
       } else {
         console.log("password does not match ");
         return res.status(422).json({ error: "Invalid " });
