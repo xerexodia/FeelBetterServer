@@ -11,13 +11,8 @@ const FILE_TAP_MAP = {
 };
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const isValid = FILE_TAP_MAP[file.mimetype];
-    let uploadError = new Error("invalid image type");
-    if (isValid) {
-      uploadError = null;
-    }
-    cb(uploadError, "public/uploads");
+  destination: (req, file, cb) => {
+    cb(null, "public/uploads/");
   },
   filename: function (req, file, cb) {
     const fielname = "postImage";
@@ -31,7 +26,7 @@ const uploadOptions = multer({ storage: storage });
 // adding post
 router.post("/post", uploadOptions.single("image"), async (req, res) => {
   const image = req.file;
-  const fileName = image.filename;
+  const fileName = image?.filename;
   const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
   try {
     const post = await new Post({
@@ -70,6 +65,22 @@ router.get("/post", async (req, res) => {
       status: "success",
       msg: "data fetched successfully",
       data: data,
+    });
+  } else {
+    res.send({
+      status: "failed",
+      msg: "something went wrong",
+    });
+  }
+});
+// getting all posts by userId
+router.get("/post/user/:id", async (req, res) => {
+  const posts = await Post.find({ userId: req.params.id });
+  if (posts) {
+    res.send({
+      status: "success",
+      msg: "data fetched successfully",
+      data: posts,
     });
   } else {
     res.send({

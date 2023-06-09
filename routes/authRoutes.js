@@ -55,6 +55,30 @@ router.post("/Signup", async (req, res) => {
     console.log(err);
   }
 });
+router.post("/Signup/pro", async (req, res) => {
+  //console.log(req.body);
+  const { name, email, age, password } = req.body;
+
+  const user = new UserPro({
+    name,
+    email,
+    age,
+    password,
+  });
+
+  try {
+    await user.save();
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    res.send({
+      status: "success",
+      msg: "user Registerd Successfully ",
+      token,
+      data: user,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 router.post("/Verify", async (req, res) => {
   const { name, email, age, password } = req.body;
@@ -89,10 +113,19 @@ router.post("/Login", async (req, res) => {
   if (!email || !password) {
     return res.status(422).json({ error: "Please add email or pasword " });
   }
-  const savedUser = await User.findOne({ email: email });
+  const user = await User.findOne({ email: email });
+  const userPro = await UserPro.findOne({ email: email });
+  let savedUser;
+  if (user) {
+    savedUser = user;
+  }
+  if (userPro) {
+    savedUser = userPro;
+  }
   if (!savedUser) {
     return res.status(422).json({ error: "Invalid " });
   }
+
   try {
     bcrypt.compare(password, savedUser.password, (err, result) => {
       if (result) {
