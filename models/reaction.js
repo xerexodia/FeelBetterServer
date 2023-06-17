@@ -5,7 +5,6 @@ const reactionSchema = mongoose.Schema({
     enum: ["like", "love", "wow", "lol"],
     default: null,
   },
-
   creatorId: {
     type: mongoose.Schema.Types.ObjectId,
   },

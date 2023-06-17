@@ -10,6 +10,7 @@ const FILE_TAP_MAP = {
   "image/jpg": "jpg",
 };
 
+//images
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const isValid = FILE_TAP_MAP[file.mimetype];
@@ -134,3 +135,6 @@ router.delete("post/:id", async (req, res) => {
 });
 
 module.exports = router;
+
+//l'enregistrement des images et des fichiers local dans le serveur BF URl
+//

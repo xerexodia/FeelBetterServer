@@ -10,7 +10,7 @@ const REACTIONS = {
   wow: "wow",
   lol: "lol",
 };
-
+//get by post
 router.get("/reaction/:postId", async (req, res) => {
   try {
     const emojis = await Reaction.find({ postId: req.params.postId });

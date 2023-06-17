@@ -108,5 +108,26 @@ router.post("/Login", async (req, res) => {
     console.log(err);
   }
 });
+// admin login
+router.post("/admin", async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  let a = req.body.data;
+  try {
+    //const ch = await challenge.find();
+    //const s = await admin.create(mode);
+    const data = await admin.find({ login: a.login });
+    if (a.password == "admin123") {
+      res.json(true);
+    } else res.json(false);
+    console.log(data);
+
+    //res.json(s);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 module.exports = router;

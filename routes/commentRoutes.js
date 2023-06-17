@@ -25,6 +25,7 @@ router.post("/comment", async (req, res) => {
 
 // get post comments
 router.get("/comment/:postId", async (req, res) => {
+  //manque user data
   try {
     const comments = await Comment.find({ postId: req.params.postId });
     if (comments.length > 0) {

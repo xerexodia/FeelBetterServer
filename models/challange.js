@@ -1,28 +1,37 @@
 const mongoose = require("mongoose");
 const challengeSchema = new mongoose.Schema({
+  id: {
+    type: String,
+    require: true,
+  },
+  title: {
+    type: String,
+    require: true,
+  },
+  description: {
+    type: String,
+    require: true,
+  },
+  createdAt: {
+    type: String,
+    require: true,
+  },
   mode: {
     type: String,
-    require: true,
+    enum: [
+      "Really Sad",
+      "Super Awesome",
+      "Pretty Good",
+      "I'm Okay",
+      "Somewhat Bad",
+    ],
   },
-  text: {
-    type: String,
-    require: true,
-  },
-
-  word1: {
-    type: String,
-    require: true,
-  },
-  word2: {
-    type: String,
-    require: true,
-  },
-  word3: {
-    type: String,
+  duration: {
+    type: Number,
     require: true,
   },
 });
 
-const challange = mongoose.model("challange", challengeSchema);
+const challenge = mongoose.model("challenge", challengeSchema);
 
-module.exports = challange;
+module.exports = challenge;

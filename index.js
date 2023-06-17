@@ -24,31 +24,23 @@ const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const reaction = require("./routes/reaction");
 const note = require("./routes/note");
-require("./models/challange");
-const challenge = require("./models/challange");
-//
+const moodRoutes = require("./routes/mood");
+const challengeRoutes = require("./routes/challenge");
+const statsRoute = require("./routes/stats");
 app.use(bodyParser.json());
 app.use(authRouters);
 app.use(postRoutes);
 app.use(commentRoutes);
 app.use(reaction);
 app.use(note);
+app.use(moodRoutes);
+app.use(challengeRoutes);
+app.use(statsRoute);
 //
 
 app.get("/", requireToken, (req, res) => {
   console.log(req.user);
   res.send(req.user);
-});
-
-app.put("/challenge", async (req, res) => {
-  //let mode=req.body.mode;
-  try {
-    const ch = await challenge.find();
-    res.json("data");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
 });
 
 app.listen(port, () => {
