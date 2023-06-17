@@ -4,6 +4,7 @@ const cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
 //
+require("./models/Admin");
 require("./db");
 require("./models/User");
 require("./models/UserPro");
@@ -29,6 +30,11 @@ const challengeRoutes = require("./routes/challenge");
 const statsRoute = require("./routes/stats");
 const sentences = require("./routes/sentences");
 const previleges = require("./routes/previleges");
+const citaion = require("./routes/citation");
+const favoris = require("./routes/favoris");
+require("./models/challange");
+const challenge = require("./models/challange");
+//
 app.use(bodyParser.json());
 app.use(authRouters);
 app.use(postRoutes);
@@ -40,6 +46,9 @@ app.use(challengeRoutes);
 app.use(statsRoute);
 app.use(sentences);
 app.use(previleges);
+app.use(citaion);
+app.use(favoris);
+
 //
 
 app.get("/", requireToken, (req, res) => {

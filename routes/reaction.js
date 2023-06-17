@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const UserPro = require("../models/UserPro");
 const Reaction = require("../models/reaction");
 
 const express = require("express");
@@ -14,14 +15,19 @@ const REACTIONS = {
 router.get("/reaction/:postId", async (req, res) => {
   try {
     const emojis = await Reaction.find({ postId: req.params.postId });
-    console.log(emojis);
     const data = await Promise.all(
       emojis.map(async (item) => {
         const user = await User.findById(item.creatorId);
-        console.log(user);
+        const userPro = await UserPro.findById(item.creatorId);
         if (user) {
           return {
             user: user,
+            reaction: item,
+          };
+        }
+        if (userPro) {
+          return {
+            user: userPro,
             reaction: item,
           };
         }
@@ -41,7 +47,15 @@ router.post("/reaction/:postId/:creatorId", async (req, res) => {
   const creatorId = req.params.creatorId;
   const { reaction } = req.body;
   const userReaction = await Reaction.findOne({ creatorId, postId });
-  const user = await User.findById(creatorId);
+  const users = await User.findById(creatorId);
+  const userPro = await UserPro.findById(creatorId);
+  let user = {};
+  if (users) {
+    user = users;
+  }
+  if (userPro) {
+    user = userPro;
+  }
   if (userReaction) {
     if (userReaction.reaction === reaction) {
       return await Reaction.findByIdAndDelete(userReaction._id);

@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
 const UserPro = mongoose.model("UserPro");
+const Admin = mongoose.model("Admin");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
@@ -56,6 +57,31 @@ router.post("/Signup", async (req, res) => {
   }
 });
 
+router.post("/Signup/pro", async (req, res) => {
+  //console.log(req.body);
+  const { name, email, age, password } = req.body;
+
+  const user = new UserPro({
+    name,
+    email,
+    age,
+    password,
+  });
+
+  try {
+    await user.save();
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    res.send({
+      status: "success",
+      msg: "user Registerd Successfully ",
+      token,
+      data: user,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 router.post("/Verify", async (req, res) => {
   const { name, email, age, password } = req.body;
   const savedUser = await User.findOne({ email: email });
@@ -89,10 +115,19 @@ router.post("/Login", async (req, res) => {
   if (!email || !password) {
     return res.status(422).json({ error: "Please add email or pasword " });
   }
-  const savedUser = await User.findOne({ email: email });
+  const user = await User.findOne({ email: email });
+  const userPro = await UserPro.findOne({ email: email });
+  let savedUser;
+  if (user) {
+    savedUser = user;
+  }
+  if (userPro) {
+    savedUser = userPro;
+  }
   if (!savedUser) {
     return res.status(422).json({ error: "Invalid " });
   }
+
   try {
     bcrypt.compare(password, savedUser.password, (err, result) => {
       if (result) {
@@ -108,26 +143,69 @@ router.post("/Login", async (req, res) => {
     console.log(err);
   }
 });
-// admin login
-router.post("/admin", async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  let a = req.body.data;
-  try {
-    //const ch = await challenge.find();
-    //const s = await admin.create(mode);
-    const data = await admin.find({ login: a.login });
-    if (a.password == "admin123") {
-      res.json(true);
-    } else res.json(false);
-    console.log(data);
 
-    //res.json(s);
+//admin signup
+router.post("/register", async (req, res) => {
+  const { fname, lname, email, password } = req.body;
+
+  const encryptedPassword = await bcrypt.hash(password, 8);
+  try {
+    const oldAdmin = await Admin.findOne({ email });
+    if (oldAdmin) {
+      return res.send({
+        error: " admin Exists",
+      });
+    }
+    await Admin.create({
+      fname,
+      lname,
+      email,
+      password: encryptedPassword,
+    });
+    res.send({
+      status: "success",
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.send({
+      status: "failed",
+    });
   }
+});
+
+// admin login
+router.post("/loginadmin", async (req, res) => {
+  const { email, password } = req.body;
+  const admin = await Admin.findOne({ email });
+  if (!admin) {
+    return res.send({ error: " admin not  found" });
+  }
+  if (await bcrypt.compare(password, admin.password)) {
+    const token = jwt.sign({ email: admin.email }, process.env.JWT_SECRET);
+
+    if (res.status(201)) {
+      return res.json({ status: "success", data: token });
+    } else {
+      return res.json({ error: "error" });
+    }
+  }
+  return res.json({ status: "error", error: "Invalid Password" });
+});
+
+//verif admin
+router.post("/adminData", async (req, res) => {
+  const { token } = req.body;
+  try {
+    const admin = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(admin);
+    const adminemail = admin.email;
+    Admin.findOne({ email: adminemail })
+      .then((data) => {
+        return res.send({ status: "success", data: data });
+      })
+      .catch((error) => {
+        return res.send({ error: "error", data: error });
+      });
+  } catch (error) {}
 });
 
 module.exports = router;
