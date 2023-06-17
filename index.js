@@ -24,6 +24,8 @@ const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const reaction = require("./routes/reaction");
 const note = require("./routes/note");
+const citaion = require("./routes/citation");
+const favoris = require("./routes/favoris");
 require("./models/challange");
 const challenge = require("./models/challange");
 //
@@ -33,6 +35,8 @@ app.use(postRoutes);
 app.use(commentRoutes);
 app.use(reaction);
 app.use(note);
+app.use(citaion);
+app.use(favoris);
 //
 
 app.get("/", requireToken, (req, res) => {
