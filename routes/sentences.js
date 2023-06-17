@@ -56,3 +56,5 @@ router.get("/sentences", async (req, res) => {
     data: randomSentence,
   });
 });
+
+module.exports = router;

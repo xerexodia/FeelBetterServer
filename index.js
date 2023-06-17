@@ -1,6 +1,6 @@
 const express = require("express");
-const port = 3000;
-
+const port = 5000;
+const cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
 //
@@ -15,7 +15,7 @@ app.use(
   "/public/uploads",
   express.static(path.join(__dirname, "public/uploads"))
 ); //  "public" off of current is root
-
+app.use(cors());
 //routes
 const authRouters = require("./routes/authRoutes");
 const requireToken = require("./middlewares/AuthTokenRequired");
@@ -27,6 +27,8 @@ const note = require("./routes/note");
 const moodRoutes = require("./routes/mood");
 const challengeRoutes = require("./routes/challenge");
 const statsRoute = require("./routes/stats");
+const sentences = require("./routes/sentences");
+const previleges = require("./routes/previleges");
 app.use(bodyParser.json());
 app.use(authRouters);
 app.use(postRoutes);
@@ -36,6 +38,8 @@ app.use(note);
 app.use(moodRoutes);
 app.use(challengeRoutes);
 app.use(statsRoute);
+app.use(sentences);
+app.use(previleges);
 //
 
 app.get("/", requireToken, (req, res) => {
