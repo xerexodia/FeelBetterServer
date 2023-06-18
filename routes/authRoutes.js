@@ -86,10 +86,30 @@ router.post("/Verify", async (req, res) => {
     console.log(err);
   }
 });
-router.post("/Signup/pro", async (req, res) => {
-  //console.log(req.body);
+//verfiy pdf
+const FILE_TAP_MAP = {
+  "application/pdf": "pdf",
+};
+
+// PDF seulement
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/uploads/pdfs");
+  },
+  filename: function (req, file, cb) {
+    const filename = "postFile";
+    const extension = FILE_TAP_MAP[file.mimetype];
+    cb(null, `${filename}-${Date.now()}.${extension}`);
+  },
+});
+const uploadOptions = multer({ storage: storage });
+
+router.post("/Signup/pro", uploadOptions.single("file"), async (req, res) => {
+  const pdf = req.file;
+  const fileName = pdf?.filename;
+  const basePath = `${req.protocol}://${req.get("host")}/public/uploads/pdfs`; //console.log(req.body);
   const { name, email, age, password, job, adress, file } = req.body;
-  const user = new UserPro({
+  const userPro = new UserPro({
     name,
     email,
     age,
@@ -100,72 +120,22 @@ router.post("/Signup/pro", async (req, res) => {
   });
 
   try {
-    await user.save();
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    const file = await new file({
+      pdf: `${basePath}${fileName}`,
+      ...req.body,
+    });
+    await userPro.save();
+    const token = jwt.sign({ _id: userPro._id }, process.env.JWT_SECRET);
     res.send({
       status: "success",
       msg: "user Registerd Successfully ",
       token,
-      data: user,
+      data: userPro,
     });
   } catch (err) {
     console.log(err);
   }
 });
-//verfiy pdf
-const FILE_TAP_MAP = {
-  "application/pdf": "pdf",
-};
-
-// PDF seulement
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/uploads/");
-  },
-  filename: function (req, file, cb) {
-    const filename = "postFile";
-    const extension = FILE_TAP_MAP[file.mimetype];
-    cb(null, `${filename}-${Date.now()}.${extension}`);
-  },
-});
-const uploadOptions = multer({ storage: storage });
-// verify userPro
-router.post("/VerifyPro", uploadOptions.single("file"), async (req, res) => {
-  const pdf = req.file;
-  const fileName = pdf?.filename;
-  const basePath = `${req.protocol}://${req.get("host")}/public/uploads/pdfs`;
-  console.log(fileName);
-  const { name, email, age, password, job, adress, file } = req.body;
-  const savedUser = await User.findOne({ email: email });
-  if (savedUser) {
-    console.log(savedUser);
-    return res.status(422).send({ status: "failed", msg: "you have account " });
-  }
-  try {
-    let VerificationCode = Math.floor(1000000 + Math.random() * 9000000);
-    let user = [
-      {
-        name,
-        email,
-        age,
-        password,
-        job,
-        adress,
-        fileName,
-        VerificationCode,
-      },
-    ];
-    await mailer(email, VerificationCode);
-    res.send({
-      status: "success",
-      msg: "verfication code sent to your Email",
-      data: user,
-    });
-  } catch (err) {
-    console.log(err);
-  }
-});
-
 router.post("/Login", async (req, res) => {
   const { email, password } = req.body;
   console.log(email);
