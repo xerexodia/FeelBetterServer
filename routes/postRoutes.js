@@ -1,6 +1,7 @@
 const express = require("express");
 const Post = require("../models/Post");
 const User = require("../models/User");
+const UserPro = require("../models/UserPro");
 const router = express.Router();
 const multer = require("multer");
 
@@ -55,13 +56,25 @@ router.post("/post", uploadOptions.single("image"), async (req, res) => {
 router.get("/post", async (req, res) => {
   const posts = await Post.find();
   if (posts) {
-    const data = await posts.map(async (item) => {
-      const user = await User.findById(item.userId);
-      return {
-        post: item,
-        user: user,
-      };
-    });
+    console.log(posts);
+    const data = await Promise.all(
+      posts.map(async (item) => {
+        const user = await User.findById(item.userId);
+        const userPro = await UserPro.findById(item.userId);
+        if (user) {
+          return {
+            post: item,
+            user: user,
+          };
+        }
+        if (userPro) {
+          return {
+            post: item,
+            user: userPro,
+          };
+        }
+      })
+    );
     res.send({
       status: "success",
       msg: "data fetched successfully",

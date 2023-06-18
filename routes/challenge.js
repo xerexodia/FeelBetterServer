@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const challenge = require("../models/challange");
 const Mood = require("../models/mood");
+const { subtractSeconds, getRandom } = require("../utils/helpers");
 
 // add challenge
 router.post("/ChallangeAdd", async (req, res) => {
@@ -76,17 +77,24 @@ router.delete("/ChallangeDelete/:id", async (req, res) => {
 router.get("/challenge/:userId", async (req, res) => {
   const id = req.params.userId;
   const date = new Date();
-  const endDate = subtractSeconds(date, 1000);
+  const endDate = date.toISOString();
+  const beginDate = new Date(date.setHours(0, 0, 0, 0)).toISOString();
+  console.log(endDate);
   try {
     const mood = await Mood.find({
       creatorId: id,
-      createdAt: { $gte: date, $lt: endDate },
+      createdAt: {
+        $gte: beginDate,
+        $lte: endDate,
+      },
     });
     if (mood) {
-      const challenge = await challenge.find({ mode: mood[0]?.title });
-      const num = getRandom(challenge.length);
-      const randomchallenge = challenge[num];
-
+      const challenges = await challenge.find({
+        mode: mood[mood.length - 1]?.title,
+      });
+      console.log(challenges);
+      const num = getRandom(challenges);
+      const randomchallenge = challenges[num];
       res.send({
         status: "success",
         msg: "data fetched successfully",

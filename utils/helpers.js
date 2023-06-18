@@ -9,4 +9,4 @@ function subtractSeconds(date, seconds) {
   return date;
 }
 // Vérifie si l'humeur spécifiée existe dans les défis
-exports = { getRandom, subtractSeconds };
+module.exports = { getRandom, subtractSeconds };

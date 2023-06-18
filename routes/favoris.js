@@ -10,8 +10,8 @@ router.post("/favoris", async (req, res) => {
     creatorId: req.body.creatorId,
     citationId: req.body.citationId,
   });
-  if (favoris) {
-    await Favoris.findByIdAndDelete(favoris[0]._id);
+  if (favoris.length > 0) {
+    await Favoris.findByIdAndDelete(favoris[favoris.length - 1]._id);
     res.send({
       status: "success",
       msg: "citaion deleted from your favoris",
@@ -24,9 +24,11 @@ router.post("/favoris", async (req, res) => {
     });
   }
 });
-
+//
 router.get("/favoris/:id", async (req, res) => {
-  const favoris = await Favoris.find({ creatorId: req.params.id });
+  const favoris = await Favoris.find({ creatorId: req.params.id }).populate(
+    "citationId"
+  );
   if (favoris.length > 0) {
     res.send({
       status: "success",
@@ -38,6 +40,32 @@ router.get("/favoris/:id", async (req, res) => {
       status: "success",
       msg: "u haven't favoris yet",
     });
+  }
+});
+//
+router.get("/favoris/:id/:postId", async (req, res) => {
+  const favoris = await Favoris.find({
+    creatorId: req.params.id,
+    citationId: req.params.postId,
+  });
+  if (favoris.length > 0) {
+    res.send({
+      status: "success",
+      msg: "data fetched succesfully",
+      data: favoris[0],
+    });
+  } else {
+    res.send({
+      status: "success",
+      msg: "u haven't favoris yet",
+    });
+  }
+});
+router.delete("/favoris/:id", async (req, res) => {
+  try {
+    await Favoris.findByIdAndDelete(req.params.id);
+  } catch (error) {
+    console.log(error);
   }
 });
 

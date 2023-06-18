@@ -168,6 +168,7 @@ router.post("/VerifyPro", uploadOptions.single("file"), async (req, res) => {
 
 router.post("/Login", async (req, res) => {
   const { email, password } = req.body;
+  console.log(email);
   if (!email || !password) {
     return res.status(422).json({ error: "Please add email or pasword " });
   }

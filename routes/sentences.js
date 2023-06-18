@@ -1,5 +1,6 @@
 const express = require("express");
 const sentence_seggestions = require("../models/sentence");
+const { getRandom } = require("../utils/helpers");
 const router = express.Router();
 
 //   admin to get all sentences
@@ -48,7 +49,7 @@ router.delete("/sentence/:id", async (req, res) => {
 // users to get entences
 router.get("/sentences", async (req, res) => {
   const sentences = await sentence_seggestions.find();
-  const numRandom = getRandom();
+  const numRandom = getRandom(sentences);
   const randomSentence = sentences[numRandom];
   res.send({
     status: "success",

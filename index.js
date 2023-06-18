@@ -1,5 +1,5 @@
 const express = require("express");
-const port = 5000;
+const port = 3000;
 const cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
@@ -32,6 +32,8 @@ const sentences = require("./routes/sentences");
 const previleges = require("./routes/previleges");
 const citaion = require("./routes/citation");
 const favoris = require("./routes/favoris");
+const credentials = require("./routes/updateCredentials");
+const participate = require("./routes/participate");
 require("./models/challange");
 const challenge = require("./models/challange");
 //
@@ -48,6 +50,8 @@ app.use(sentences);
 app.use(previleges);
 app.use(citaion);
 app.use(favoris);
+app.use(participate);
+app.use(credentials);
 
 //
 

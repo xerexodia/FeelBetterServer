@@ -9,7 +9,7 @@ const favorisSchema = mongoose.Schema(
       ref: "Citation",
     },
   },
-  { timestaamp: true }
+  { timestamps: true }
 );
 
 const Favoris = mongoose.model("Favoris", favorisSchema);

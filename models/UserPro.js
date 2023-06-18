@@ -29,6 +29,9 @@ const userProSchema = mongoose.Schema({
     type: String,
     default: "userPro",
   },
+  image: {
+    type: String,
+  },
 });
 
 userProSchema.pre("save", async function (next) {
