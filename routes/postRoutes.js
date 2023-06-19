@@ -78,7 +78,7 @@ router.get("/post", async (req, res) => {
     res.send({
       status: "success",
       msg: "data fetched successfully",
-      data: data,
+      data: data.reverse(),
     });
   } else {
     res.send({
@@ -105,20 +105,25 @@ router.get("/post/user/:id", async (req, res) => {
 });
 
 // gettting posts by user id
-router.get("post/:id", async (req, res) => {
+router.get("/post/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const user = await User.findById(id);
+    const user = await UserPro.findById(id);
     if (user) {
       const posts = await Post.find({ userId: id });
       if (posts.length > 0) {
+        const data = await Promise.all(
+          posts.map(async (item) => {
+            return {
+              post: item,
+              user: user,
+            };
+          })
+        );
         res.send({
           status: "success",
           msg: "data fetched successfully",
-          data: {
-            posts: posts,
-            user: user,
-          },
+          data: data.reverse(),
         });
       } else {
         res.send({
@@ -138,7 +143,7 @@ router.get("post/:id", async (req, res) => {
 });
 
 // delete post
-router.delete("post/:id", async (req, res) => {
+router.delete("/post/:id", async (req, res) => {
   try {
     const post = Post.findById(req.params.id);
     if (post) {
